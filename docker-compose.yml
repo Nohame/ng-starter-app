@@ -1,0 +1,31 @@
+version: '3.8'
+
+# DEVELOPMENT
+services:
+  # Angular Application
+  web_app:
+    build:
+      context : .
+      dockerfile : Dockerfile
+      args:
+        NUXT_HOST: ${ANGULAR_HOST:-0.0.0.0}
+        NUXT_PORT: ${ANGULAR_PORT:-3000}
+        APP_NAME: ${APP_NAME:-angular}
+        NODE_VERSION: ${NODE_VERSION:-20}
+    container_name: ${APP_NAME:-nuxt}
+    ports:
+      - ${ANGULAR_HOST:-0.0.0.0}:${ANGULAR_PORT:-4200}:${ANGULAR_PORT:-4200}
+    volumes:
+      - ./:/usr/src/app
+      - ~/.ssh:/root/.ssh
+    command: >
+      bash -c "
+      cd ${APP_NAME:-angular} ;
+      npm install ;
+      ng serve --host ${ANGULAR_HOST:-0.0.0.0} --port ${ANGULAR_PORT:-4200} ;
+      tail -f .dockerenv"
+
+networks:
+  default:
+    name: ${NETWORK:-angular_network}
+    external: true
