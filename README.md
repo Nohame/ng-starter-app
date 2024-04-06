@@ -67,6 +67,18 @@ The `docker-compose.yml` file defines the service for the Angular application, u
 ./docker.sh ssh
 ```
 
+7. **Run `npm` commands inside the Docker container**: To use npm into the container, use `npm`:
+###### If no command is specified, the script will default to showing the npm --version 
+```sh
+./docker.sh npm install
+```
+
+8. **Execute Angular CLI (ng) commands inside the Docker container**: To use Angular CLI into the container, use `ng`:
+###### If no command is specified, the script will default to showing the ng version
+```sh
+./docker.sh ng generate component <component-name>
+```
+
 ## Contributing
 
 Feel free to contribute to the project by submitting pull requests or reporting issues.

@@ -45,6 +45,13 @@ display_success()
     echo ">>${GREEN} $@${RESET_COLOR}"
 }
 
+# Execute command.
+execute_command()
+{
+  echo ">>${GREEN} $@${RESET_COLOR}"
+  docker exec -e COLUMNS="`tput cols`" -e LINES="`tput lines`" --workdir "$path" -ti "$APP_NAME" $@ || echo "`tput setab 1`Error: Bad destination => $path `tput sgr0`"
+}
+
     echo ""
     echo "***************************************************************************************************************"
     echo "***************************************************************************************************************"
@@ -91,7 +98,7 @@ usage()
     exit
 }
 
-if [ -z $action ] || ([ $action != 'stop' ] && [ $action != 'start' ]  && [ $action != 'restart' ] && [ $action != 'ssh' ])
+if [ -z $action ] || ([ $action != 'stop' ] && [ $action != 'start' ]  && [ $action != 'restart' ] && [ $action != 'ssh' ] && [ $action != 'npm' ] && [ $action != 'ng' ])
 then
   display_error "Invalid action target ..."
   usage
@@ -133,5 +140,32 @@ elif [ $action = 'ssh' ]
 then
    path="/usr/src/app/$APP_NAME"
    printf "Connect ssh to $path in $APP_NAME container \n"
-   docker exec -e COLUMNS="`tput cols`" -e LINES="`tput lines`" --workdir $path -ti $APP_NAME bash || echo "`tput setab 1`Error: Bad destination => $path `tput sgr0`"
+   execute_command "bash"
+
+# npm: ## Execute npm cli
+elif [ $action = 'npm' ]; then
+
+  shift
+  npm_args="$*"
+
+  if [ -z "$npm_args" ]; then
+    npm_args='--version'
+  fi
+  npm_command="npm $npm_args"
+  path="/usr/src/app/$APP_NAME"
+  execute_command "$npm_command"
+
+# ng: ## Execute Angular cli
+elif [ $action = 'ng' ]; then
+
+  shift
+  ng_args="$*"
+
+  if [ -z "$ng_args" ]; then
+    ng_args='version'
+  fi
+  ng_command="ng $ng_args"
+  path="/usr/src/app/$APP_NAME"
+  execute_command "$ng_command"
+
 fi
